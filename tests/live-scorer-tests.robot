@@ -2,17 +2,6 @@
 Resource  ../SettingsAndLibraries.robot
 
 *** Test Cases ***
-Get Started
-
-    Clear All Catches
-    Select Angler On Home Page  GARY
-    Go To Home Page
-    Select Angler On Home Page  JASON
-    Go To Home Page
-    Select Angler On Home Page  JOE
-    Go To Home Page
-    Select Angler On Home Page  KEVIN
-
 
 SCENARIO - Validate Angler Links Navigate Correctly
     Given User Navigates To Live Scorer Home Page

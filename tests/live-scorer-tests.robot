@@ -36,6 +36,8 @@ SCENARIO: Start Adding Fish
 
     Big Bass Of The Day Should Be  GARY  2.20
     Individual Angler Catch Count Should Be  1
+    Most Recent Fish Caught Should Be  2.20
+    Standings Data Should Contain  GARY  1  2.20
 
 
 
@@ -82,7 +84,6 @@ Angler Page Should Reflect No Catches Exist For
     run keyword and continue on failure  page should contain  YOU HAVEN'T CAUGHT ANYTHING ${anglerName}
 
 
-
 Big Bass Of The Day Should Be
     [Arguments]  ${anglerName}  ${weight}
     run keyword and continue on failure  page should contain  BIG BASS: ${weight} - ${anglerName}
@@ -105,6 +106,7 @@ Standings Data Should Contain
     run keyword and continue on failure  should be equal as integers  ${expectedCatchCount}  ${foundCatchCount}  Incorrect total catch for ${name}
     run keyword and continue on failure  should be equal as numbers  ${expectedTotalWeight}  ${foundTotalWeight}  Incorrect total weight for ${name}
 
+
 User Clicks Add Fish
     click element  //*/button[text() = '${SPACE}Add Fish${SPACE}']
     wait until element is visible  //*/div[@id = 'add-fish']
@@ -115,3 +117,9 @@ User Adds New Fish
     input text  //*/input  ${weight}
     click element  //*/button[text() = 'OK']
     wait until element is not visible  //*/div[@id = 'add-fish']
+
+Most Recent Fish Caught Should Be
+    [Arguments]  ${expectedWeight}
+
+    ${foundWeight}=  get text  //*/h5/strong[contains (text(), 'Your Catch Count')]/../../table/tbody/tr[1]/td[2]
+    run keyword and continue on failure  should be equal as numbers  ${expectedWeight}  ${foundWeight}  Weight of most recent fish is incorrect

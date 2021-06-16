@@ -55,12 +55,12 @@ User Navigates To Live Scorer Home Page
 
 User Clicks Angler Name
     [Arguments]  ${anglerName}
-    click element  //*/button[text() = '${SPACE}${anglerName}${SPACE}']
+    click element  ${anglerName}
     Sleep  2s
 
 
 User Clears All Catches
-    click element  //*/button[@class = 'btn btn-danger btn-sm']
+    click element  clearAll
     Sleep  3s
 
 
@@ -74,14 +74,14 @@ User Returns To Home Page
 Angler Page Heading Should Be
     [Arguments]  ${expected}
 
-    ${found}=  get text  //*/h1
+    ${found}=  get text  header
     run keyword and continue on failure  should be equal as strings  ${expected}  ${found}  Incorrect Angler heading
 
 
 Angler Page Should Reflect No Catches Exist For
     [Arguments]  ${anglerName}
     run keyword and continue on failure  page should contain  NO FISH CAUGHT IN THE FIELD
-    run keyword and continue on failure  page should contain  YOU HAVEN'T CAUGHT ANYTHING ${anglerName}
+    run keyword and continue on failure  page should contain  ${angerlName}, YOU HAVEN'T CAUGHT ANYTHING YET${anglerName}
 
 
 Big Bass Of The Day Should Be
@@ -93,33 +93,33 @@ Individual Angler Catch Count Should Be
     [Arguments]  ${expectedCount}
     run keyword and continue on failure  page should contain  Your Catch Count: ${expectedCount}
 
-    ${foundRowCount}=  get element count  //*/h5/strong[contains (text(), 'Your Catch Count')]/../../table/tbody/tr
+    ${foundRowCount}=  get element count  //*/table[@id = 'individualCatchList']/tbody/tr
     run keyword and continue on failure  should be equal as integers  ${expectedCount}  ${foundRowCount}  Wrong number of individual fish catch rows
 
 
 Standings Data Should Contain
     [Arguments]  ${name}  ${expectedCatchCount}  ${expectedTotalWeight}
 
-    ${foundCatchCount}=  get text  //*/table/tbody/tr/td[1][text() = '${name}']/../td[2]
-    ${foundTotalWeight}=  get text  //*/table/tbody/tr/td[1][text() = '${name}']/../td[3]
+    ${foundCatchCount}=  get text  //*/table[@id='leaderboard']/tbody/tr/td[1][text() = '${name}']/../td[2]
+    ${foundTotalWeight}=  get text  //*/table[@id='leaderboard']/tbody/tr/td[1][text() = '${name}']/../td[3]
 
     run keyword and continue on failure  should be equal as integers  ${expectedCatchCount}  ${foundCatchCount}  Incorrect total catch for ${name}
     run keyword and continue on failure  should be equal as numbers  ${expectedTotalWeight}  ${foundTotalWeight}  Incorrect total weight for ${name}
 
 
 User Clicks Add Fish
-    click element  //*/button[text() = '${SPACE}Add Fish${SPACE}']
-    wait until element is visible  //*/div[@id = 'add-fish']
+    click element  addFish
+    wait until element is visible  add-fish
 
 
 User Adds New Fish
     [Arguments]  ${weight}
     input text  //*/input  ${weight}
     click element  //*/button[text() = 'OK']
-    wait until element is not visible  //*/div[@id = 'add-fish']
+    wait until element is not visible  add-fish
 
 Most Recent Fish Caught Should Be
     [Arguments]  ${expectedWeight}
 
-    ${foundWeight}=  get text  //*/h5/strong[contains (text(), 'Your Catch Count')]/../../table/tbody/tr[1]/td[2]
+    ${foundWeight}=  get text  //*/table[@id = 'individualCatchList']/tbody/tr[1]/td[2]
     run keyword and continue on failure  should be equal as numbers  ${expectedWeight}  ${foundWeight}  Weight of most recent fish is incorrect

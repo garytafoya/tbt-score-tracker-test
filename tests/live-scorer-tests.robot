@@ -52,7 +52,6 @@ User Navigates To Live Scorer Home Page
     open browser  ${app-url}  chrome
 
 
-
 User Clicks Angler Name
     [Arguments]  ${anglerName}
     click element  ${anglerName}
@@ -81,7 +80,7 @@ Angler Page Heading Should Be
 Angler Page Should Reflect No Catches Exist For
     [Arguments]  ${anglerName}
     run keyword and continue on failure  page should contain  NO FISH CAUGHT IN THE FIELD
-    run keyword and continue on failure  page should contain  ${angerlName}, YOU HAVEN'T CAUGHT ANYTHING YET${anglerName}
+    run keyword and continue on failure  page should contain  ${anglerName}, YOU HAVEN'T CAUGHT ANYTHING YET
 
 
 Big Bass Of The Day Should Be

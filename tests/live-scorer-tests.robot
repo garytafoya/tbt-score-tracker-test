@@ -9,19 +9,19 @@ go to site
 SCENARIO - Validate Angler Links Navigate Correctly
     Given User Navigates To Live Scorer Home Page
       And User Clears All Catches
-    When User Clicks Angler Name  GARY
+    When User Clicks Angler GARY
     Then Angler Page Heading Should Be  GARY
       And Angler Page Should Reflect No Catches Exist For  GARY
     When User Returns To Home Page
-      And User Clicks Angler Name  JASON
+      And User Clicks Angler JASON
     Then Angler Page Heading Should Be  JASON
       And Angler Page Should Reflect No Catches Exist For  JASON
     When User Returns To Home Page
-      And User Clicks Angler Name  JOE
+      And User Clicks Angler JOE
     Then Angler Page Heading Should Be  JOE
       And Angler Page Should Reflect No Catches Exist For  JOE
     When User Returns To Home Page
-      And User Clicks Angler Name  KEVIN
+      And User Clicks Angler KEVIN
     Then Angler Page Heading Should Be  KEVIN
       And Angler Page Should Reflect No Catches Exist For  KEVIN
 
@@ -29,15 +29,16 @@ SCENARIO - Validate Angler Links Navigate Correctly
 SCENARIO: Start Adding Fish
     Given User Navigates To Live Scorer Home Page
       And User Clears All Catches
-    When User Clicks Angler Name  GARY
+    When User Clicks Angler GARY
+      And User Clicks Add Fish
+      And User Adds Fish Catch That Weighs 2.20
+    Then  Big Bass Should Be 2.20 By GARY
+      And Angler Should Have Caught 1 Fish
+      And Most Recent Fish Caught Should Weigh 2.20
+      And Standings Data Should Contain  GARY  1  2.20  2.20
 
-    User Clicks Add Fish
-    User Adds New Fish  2.20
 
-    Big Bass Of The Day Should Be  GARY  2.20
-    Individual Angler Catch Count Should Be  1
-    Most Recent Fish Caught Should Be  2.20
-    Standings Data Should Contain  GARY  1  2.20
+
 
 
 
@@ -52,8 +53,7 @@ User Navigates To Live Scorer Home Page
     open browser  ${app-url}  chrome
 
 
-User Clicks Angler Name
-    [Arguments]  ${anglerName}
+User Clicks Angler ${anglerName}
     click element  ${anglerName}
     Sleep  2s
 
@@ -83,13 +83,11 @@ Angler Page Should Reflect No Catches Exist For
     run keyword and continue on failure  page should contain  ${anglerName}, YOU HAVEN'T CAUGHT ANYTHING YET
 
 
-Big Bass Of The Day Should Be
-    [Arguments]  ${anglerName}  ${weight}
+Big Bass Should Be ${weight} By ${anglerName}
     run keyword and continue on failure  page should contain  BIG BASS: ${weight} - ${anglerName}
 
 
-Individual Angler Catch Count Should Be
-    [Arguments]  ${expectedCount}
+Angler Should Have Caught ${expectedCount} Fish
     run keyword and continue on failure  page should contain  Your Catch Count: ${expectedCount}
 
     ${foundRowCount}=  get element count  //*/table[@id = 'individualCatchList']/tbody/tr
@@ -97,28 +95,27 @@ Individual Angler Catch Count Should Be
 
 
 Standings Data Should Contain
-    [Arguments]  ${name}  ${expectedCatchCount}  ${expectedTotalWeight}
+    [Arguments]  ${name}  ${expectedCatchCount}  ${expectedTotalWeight}  ${expectedBestFive}
 
     ${foundCatchCount}=  get text  //*/table[@id='leaderboard']/tbody/tr/td[1][text() = '${name}']/../td[2]
     ${foundTotalWeight}=  get text  //*/table[@id='leaderboard']/tbody/tr/td[1][text() = '${name}']/../td[3]
+    ${foundBestFive}=  get text  //*/table[@id='leaderboard']/tbody/tr/td[1][text() = '${name}']/../td[4]
 
     run keyword and continue on failure  should be equal as integers  ${expectedCatchCount}  ${foundCatchCount}  Incorrect total catch for ${name}
     run keyword and continue on failure  should be equal as numbers  ${expectedTotalWeight}  ${foundTotalWeight}  Incorrect total weight for ${name}
-
+    run keyword and continue on failure  should be equal as numbers  ${expectedBestFive}  ${foundBestFive}  Incorrect best 5 weight for ${name}
 
 User Clicks Add Fish
     click element  addFish
     wait until element is visible  add-fish
 
 
-User Adds New Fish
-    [Arguments]  ${weight}
+User Adds Fish Catch That Weighs ${weight}
     input text  //*/input  ${weight}
     click element  //*/button[text() = 'OK']
     wait until element is not visible  add-fish
 
-Most Recent Fish Caught Should Be
-    [Arguments]  ${expectedWeight}
 
+Most Recent Fish Caught Should Weigh ${expectedWeight}
     ${foundWeight}=  get text  //*/table[@id = 'individualCatchList']/tbody/tr[1]/td[2]
     run keyword and continue on failure  should be equal as numbers  ${expectedWeight}  ${foundWeight}  Weight of most recent fish is incorrect

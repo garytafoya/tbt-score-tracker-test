@@ -3,9 +3,6 @@ Resource  ../SettingsAndLibraries.robot
 
 *** Test Cases ***
 
-go to site
-    User Navigates To Live Scorer Home Page
-
 SCENARIO - Validate Clearing All Catches Resets The Site
     Given User Navigates To Live Scorer Home Page
     When User Clears All Catches

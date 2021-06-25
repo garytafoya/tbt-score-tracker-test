@@ -6,7 +6,7 @@ Resource  ../SettingsAndLibraries.robot
 SCENARIO - Validate Clearing All Catches Resets The Site
     Given User Navigates To Live Scorer Home Page
     When User Clears All Catches
-      And Clicks Angler GARY
+      And User Clicks Angler GARY
     Then Angler Page Heading Should Be  GARY
       And Angler Page Should Reflect No Catches Exist For GARY
     When User Returns To Home Page
@@ -114,6 +114,18 @@ SCENARIO: Validate Best Five Column In Leaderboard
     Then First Place Should Be GARY With 6 Catches, Total Weight Of 30.00 And Best Five Of 25.00
 
 
+SCENARIO: Validate Entering Invalid Weight Values Is Not Allowed
+    Given User Navigates To Live Scorer Home Page
+    When User Clicks Angler GARY
+      And User Adds Invalid Fish Catch Data 1e
+    Then Fish Weight Error Should Be Displayed
+    When User Cancels Add Fish
+      And User Adds Invalid Fish Catch Data .5
+    Then Fish Weight Error Should Be Displayed
+    When User Cancels Add Fish
+      And User Adds Invalid Fish Catch Data 5.55555
+    Then Fish Weight Error Should Be Displayed
+
 *** Keywords ***
 # ====================================
 # Home Page Keywords
@@ -128,8 +140,11 @@ User Clicks Angler ${anglerName}
 
 
 User Clears All Catches
+    click element  admin
+    wait until element is visible  clearAll
     click element  clearAll
-    Sleep  3s
+    alert should be present  Deleted All Catches
+    wait until element is visible  header
 
 
 User Returns To Home Page
@@ -152,7 +167,7 @@ Angler Page Should Reflect No Catches Exist For ${anglerName}
 
 
 Big Bass Should Be ${weight} By ${anglerName}
-    run keyword and continue on failure  page should contain  BIG BASS: ${weight} - ${anglerName}
+    run keyword and continue on failure  page should contain  Big Bass: ${anglerName} - ${weight}
 
 
 Angler Should Have Caught ${expectedCount} Fish
@@ -178,25 +193,55 @@ User Clicks Add Fish
     wait until element is visible  add-fish
 
 
-User Adds Fish Catch That Weighs ${weight}
-    click element  addFish
-    wait until element is visible  add-fish
+User Enters Fish Weight
+    [Arguments]  ${weight}
     input text  add-fish-input  ${weight}
+
+
+User Presses OK To Fish Catch
     click element  //*/button[text() = 'OK']
+
+
+User Adds Fish Catch That Weighs ${weight}
+    User Clicks Add Fish
+    Fish Weight Error Should Not Be Displayed
+    User Enters Fish Weight  ${weight}
+    User Presses OK To Fish Catch
     wait until element is not visible  add-fish
+
+
+User Adds Invalid Fish Catch Data ${weight}
+    User Clicks Add Fish
+    User Enters Fish Weight  ${weight}
+    User Presses OK To Fish Catch
+    element should be visible  add-fish
+
+
+User Cancels Add Fish
+     click element  //*/button[text() = 'Cancel']
+
+
+Fish Weight Error Should Be Displayed
+    element should be visible  //*/div[text() = 'All fish should weigh at least 1 pound.']
+
+
+Fish Weight Error Should Not Be Displayed
+    element should not be visible  //*/div[text() = 'All fish should weigh at least 1 pound.']
 
 
 Most Recent Fish Caught Should Weigh ${expectedWeight}
     ${foundWeight}=  get text  //*/table[@id = 'individualCatchList']/tbody/tr[1]/td[2]
     run keyword and continue on failure  should be equal as numbers  ${expectedWeight}  ${foundWeight}  Weight of most recent fish is incorrect
 
+
 User Removes Fish That Weighs ${weight}
+    Scroll Element Into View  //*/table[@id = 'individualCatchList']/tbody/tr/td[2][text() = '${weight}']
     click element  //*/table[@id = 'individualCatchList']/tbody/tr/td[2][text() = '${weight}']
     wait until element is visible  delete-fish
+    Sleep  1s
+    wait until element is visible  //*/button[text() = 'OK']
     click element  //*/button[text() = 'OK']
     wait until element is not visible  delete-fish
-
-
 
 
 #========================
@@ -231,3 +276,8 @@ Check Placement
     run keyword and continue on failure  should be equal as strings  ${expectedCatchCount}  ${foundCatchCount}  Incorrect total catch for ${expectedAnglerName}
     run keyword and continue on failure  should be equal as strings  ${expectedTotalWeight}  ${foundTotalWeight}  Incorrect total weight for ${expectedAnglerName}
     run keyword and continue on failure  should be equal as strings  ${expectedBestFive}  ${foundBestFive}  Incorrect best 5 weight for ${expectedAnglerName}
+
+
+Scroll Element Into View
+    [Arguments]  ${locator}
+    run keyword and continue on failure  execute javascript  ${locator}.scrollIntoViewIfNeeded();
